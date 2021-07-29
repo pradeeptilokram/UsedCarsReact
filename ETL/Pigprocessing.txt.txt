@@ -1,0 +1,94 @@
+
+--import piggy bank jar 
+REGISTER '/usr/local/share/google/dataproc/dataproc-agent.jar'
+
+DEFINE CSVLoader
+org.apache.pig.piggybank.storage.CSVLoader();
+
+--Read all the 4 CSV files for processing
+A = Load 'hdfs://cluster-a248-m/user/hdfs/' USING org.apache.pig.piggybank.storage.CSVExcelStorage(',', 'YES_MULTILINE', 'NOCHANGE', 'SKIP_INPUT_HEADER')  
+AS (INDEX:int, ID:long, URL:chararray, REGION:chararray, REGION_URL:chararray, PRICE:int, YEAR:int, 
+MANUFACTURER:chararray, MODEL:chararray, CONDITION:chararray, CYLINDERS:chararray, FUEL:chararray, ODOMETER:int, 
+TITLE_STATUS:chararray, TRANSMISSION:chararray, VIN:chararray, DRIVE:chararray, SIZE:chararray,
+TYPE:chararray, PAINT_COLOUR:chararray, IMAGE_URL:chararray, DESCRIPTION:chararray, COUNTY:chararray,
+STATE:chararray, LAT:bigdecimal ,LON:bigdecimal) ;
+
+
+--Pulling data only for the required columns that are to be used to hive processing
+B = FOREACH A GENERATE ID,
+(REPLACE(REGION,'nan','NA')) as REGION,
+PRICE,YEAR,
+(REPLACE(MANUFACTURER,'nan','NA')) as MANUFACTURER,
+(REPLACE(MODEL,'nan','NA')) as MODEL,
+(REPLACE(CONDITION,'nan','NA')) as CONDITION,(REPLACE(CYLINDERS,'nan','NA')) as CYLINDERS,
+(REPLACE(FUEL,'nan','NA')) as FUEL,
+ODOMETER,
+(REPLACE(TITLE_STATUS,'nan','NA')) as TITLE_STATUS,
+(REPLACE(TRANSMISSION,'nan','NA')) as TRANSMISSION,
+(REPLACE(VIN,'nan','NA')) as VIN,
+(REPLACE(DRIVE,'nan','NA')) as DRIVE,
+(REPLACE(SIZE,'nan','NA')) as SIZE,
+(REPLACE(TYPE,'nan','NA')) as TYPE,
+(REPLACE(PAINT_COLOUR,'nan','NA')) as PAINT_COLOUR,
+(REPLACE(IMAGE_URL,'nan','NA')) as IMAGE_URL,
+(REPLACE(DESCRIPTION,'nan','NA')) as DESCRIPTION,
+(REPLACE(STATE,'nan','NA')) as STATECODE,
+(CASE WHEN STATE=='ak' THEN 'Alaska'
+WHEN STATE=='al' THEN 'Alabama'
+WHEN STATE=='ar' THEN 'Arkansas'
+WHEN STATE=='az' THEN 'Arizona'
+WHEN STATE=='ca' THEN 'California'
+WHEN STATE=='co' THEN 'Colorado'
+WHEN STATE=='ct' THEN 'Connecticut'
+WHEN STATE=='dc' THEN 'District of Columbia'
+WHEN STATE=='de' THEN 'Delaware'
+WHEN STATE=='fl' THEN 'Florida'
+WHEN STATE=='ga' THEN 'Georgia'
+WHEN STATE=='hi' THEN 'Hawaii'
+WHEN STATE=='ia' THEN 'Iowa'
+WHEN STATE=='id' THEN 'Idaho'
+WHEN STATE=='il' THEN 'Illinois'
+WHEN STATE=='in' THEN 'Indiana'
+WHEN STATE=='ks' THEN 'Kansas'
+WHEN STATE=='ky' THEN 'Kentucky'
+WHEN STATE=='la' THEN 'Louisiana'
+WHEN STATE=='ma' THEN 'Massachusetts'
+WHEN STATE=='md' THEN 'Maryland'
+WHEN STATE=='me' THEN 'Maine'
+WHEN STATE=='mi' THEN 'Michigan'
+WHEN STATE=='mn' THEN 'Minnesota'
+WHEN STATE=='mo' THEN 'Missouri'
+WHEN STATE=='ms' THEN 'Mississippi'
+WHEN STATE=='mt' THEN 'Montana'
+WHEN STATE=='nc' THEN 'North Carolina'
+WHEN STATE=='nd' THEN 'North Dakota'
+WHEN STATE=='ne' THEN 'Nebraska'
+WHEN STATE=='nh' THEN 'New Hampshire'
+WHEN STATE=='nj' THEN 'New Jersey'
+WHEN STATE=='nm' THEN 'New Mexico'
+WHEN STATE=='nv' THEN 'Nevada'
+WHEN STATE=='ny' THEN 'New York'
+WHEN STATE=='oh' THEN 'Ohio'
+WHEN STATE=='ok' THEN 'Oklahoma'
+WHEN STATE=='or' THEN 'Oregon'
+WHEN STATE=='pa' THEN 'Pennsylvania'
+WHEN STATE=='pr' THEN 'Puerto Rico'
+WHEN STATE=='ri' THEN 'Rhode Island'
+WHEN STATE=='sc' THEN 'South Carolina'
+WHEN STATE=='sd' THEN 'South Dakota'
+WHEN STATE=='tn' THEN 'Tennessee'
+WHEN STATE=='tx' THEN 'Texas'
+WHEN STATE=='ut' THEN 'Utah'
+WHEN STATE=='va' THEN 'Virginia'
+WHEN STATE=='vt' THEN 'Vermont'
+WHEN STATE=='wa' THEN 'Washington'
+WHEN STATE=='wi' THEN 'Wisconsin'
+WHEN STATE=='wv' THEN 'West Virginia'
+WHEN STATE=='wy' THEN 'Wyoming'
+ELSE 'NA' END) AS STATE,
+LAT,LON;
+
+
+
+STORE B INTO 'hdfs://cluster-a248-m/user/hive/test_output'
+USING org.apache.pig.piggybank.storage.CSVExcelStorage(',');

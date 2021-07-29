@@ -1,0 +1,42 @@
+import pandas as pd;
+import re;
+import glob;
+folderPath = '/home/santhoshbabuji89/input/*.csv';
+folderPathToStore = '/home/santhoshbabuji89/output';
+filename = '/home/santhoshbabuji89/input/vehicles.csv';
+rowsize=50000;
+number_lines=423857;
+for i in range(1,number_lines,rowsize):
+    dataframe = pd.read_csv(filename,header=None,nrows = rowsize,skiprows = i);
+    print("cleansing start:",i);
+    dataframe[2] = dataframe[2].apply(str).apply(lambda b: re.sub('<.*?>|\\t*\\r*\\n*\\s+',' ',b));
+    dataframe[3] = dataframe[3].apply(str).apply(lambda c: re.sub('<.*?>|\\t*\\r*\\n*\\s+',' ',c));
+    dataframe[4] = dataframe[4].apply(str).apply(lambda d: re.sub('<.*?>|\\t*\\r*\\n*\\s+',' ',d));
+    dataframe[7] = dataframe[7].apply(str).apply(lambda g: re.sub('<.*?>|\\t*\\r*\\n*\\s+',' ',g));
+    dataframe[8] = dataframe[8].apply(str).apply(lambda h: re.sub('<.*?>|\\t*\\r*\\n*\\s+',' ',h));
+    dataframe[9] = dataframe[9].apply(str).apply(lambda i: re.sub('<.*?>|\\t*\\r*\\n*\\s+',' ',i));
+    dataframe[10] = dataframe[10].apply(str).apply(lambda j: re.sub('<.*?>|\\t*\\r*\\n*\\s+',' ',j));
+    dataframe[11] = dataframe[11].apply(str).apply(lambda k: re.sub('<.*?>|\\t*\\r*\\n*\\s+',' ',k));
+    dataframe[13] = dataframe[13].apply(str).apply(lambda m: re.sub('<.*?>|\\t*\\r*\\n*\\s+',' ',m));
+    dataframe[14] = dataframe[14].apply(str).apply(lambda n: re.sub('<.*?>|\\t*\\r*\\n*\\s+',' ',n));
+    dataframe[15] = dataframe[15].apply(str).apply(lambda o: re.sub('<.*?>|\\t*\\r*\\n*\\s+',' ',o));
+    dataframe[16] = dataframe[16].apply(str).apply(lambda p: re.sub('<.*?>|\\t*\\r*\\n*\\s+',' ',p));
+    dataframe[17] = dataframe[17].apply(str).apply(lambda q: re.sub('<.*?>|\\t*\\r*\\n*\\s+',' ',q));
+    dataframe[18] = dataframe[18].apply(str).apply(lambda r: re.sub('<.*?>|\\t*\\r*\\n*\\s+',' '    ,r));
+    dataframe[19] = dataframe[19].apply(str).apply(lambda s: re.sub('<.*?>|\\t*\\r*\\n*\\s+',' ',s));
+    dataframe[20] = dataframe[20].apply(str).apply(lambda t: re.sub('<.*?>|\\t*\\r*\\n*\\s+',' ',t));
+    print("description start");
+    dataframe[21] = dataframe[21].apply(str).apply(lambda u: re.sub('<.*?>|\\t*\\r*\\n*\\s+',' ',u));
+    print("description end");
+    dataframe[22] = dataframe[22].apply(str).apply(lambda v: re.sub('<.*?>|\\t*\\r*\\n*\\s+',' ',v));
+    dataframe[23] = dataframe[23].apply(str).apply(lambda w: re.sub('<.*?>|\\t*\\r*\\n*\\s+',' ',w));
+    dataframe.to_csv('/home/santhoshbabuji89/output/vehicles_temp.csv',index=False,header=None,mode='a',chunksize=rowsize);
+
+#to generate header names
+df1 = pd.read_csv('/home/santhoshbabuji89/output/vehicles_temp.csv');
+df1.columns = ['id','url','region','region_url','price','year','manufacturer','model','condition','cylinders','fuel','odometer','title_status','transmission','vin','drive','size','type','paint_color','image_url','description','county','state','lat','long'];
+df1.to_csv('/home/santhoshbabuji89/output/vehicles.csv');
+
+#check output count
+cnt = pd.read_csv('/home/santhoshbabuji89/output/vehicles.csv');
+print("Number of rows(423857): ", len(cnt.index));
